@@ -44,19 +44,37 @@ public class MemberSignupsStreamTest {
     @Test
     public void test_first_name() {
         // Verify that the stream accurately parses the first name from the value.
-        throw new UnsupportedOperationException("not implemented");
+        ConsumerRecordFactory<Integer, String> factory = new ConsumerRecordFactory<>("member_signups", new IntegerSerializer(), new StringSerializer());
+        ConsumerRecord<byte[], byte[]> record = factory.create("member_signups", 1, "Summers, Buffy");
+        testDriver.pipeInput(record);
+        
+        ProducerRecord<Integer, String> outputRecord = testDriver.readOutput("member_signups_mail", new IntegerDeserializer(), new StringDeserializer());
+        
+        OutputVerifier.compareKeyValue(outputRecord, 1, "Buffy");
     }
     
     @Test
     public void test_unknown_name_filter() {
         // Verify that the stream filters out records with an empty name value.
-        throw new UnsupportedOperationException("not implemented");
+        ConsumerRecordFactory<Integer, String> factory = new ConsumerRecordFactory<>("member_signups", new IntegerSerializer(), new StringSerializer());
+        ConsumerRecord<byte[], byte[]> record = factory.create("member_signups", 1, "UNKNOWN");
+        testDriver.pipeInput(record);
+        
+        ProducerRecord<Integer, String> outputRecord = testDriver.readOutput("member_signups_mail", new IntegerDeserializer(), new StringDeserializer());
+        
+        Assert.assertNull(outputRecord);
     }
     
     @Test
     public void test_empty_name_filter() {
         // Verify that the stream filters out records with an empty name value.
-        throw new UnsupportedOperationException("not implemented");
+        ConsumerRecordFactory<Integer, String> factory = new ConsumerRecordFactory<>("member_signups", new IntegerSerializer(), new StringSerializer());
+        ConsumerRecord<byte[], byte[]> record = factory.create("member_signups", 1, "");
+        testDriver.pipeInput(record);
+        
+        ProducerRecord<Integer, String> outputRecord = testDriver.readOutput("member_signups_mail", new IntegerDeserializer(), new StringDeserializer());
+        
+        Assert.assertNull(outputRecord);
     }
     
 }
